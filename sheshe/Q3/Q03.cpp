@@ -23,7 +23,7 @@ int partition(vector<Data> &arr, int start, int end)
         if (arr[i].value <= pivot)
             count++;
     }
- 
+    
     // Giving pivot element its correct position
     int pivotIndex = start + count;
     swap(arr[pivotIndex], arr[start]);
@@ -67,6 +67,24 @@ void quickSort(vector<Data> &arr, int start, int end)
     // Sorting the right part
     quickSort(arr, p + 1, end);
 
+}
+
+// TODO 難!!
+vector<Data> nameSort(vector<Data> &arr){
+    if(!arr.empty()){
+        return arr;
+    }
+
+    int maxVal = 0;
+    for(int d: arr){
+
+    }
+
+    vector<vector<Data>> organizedArr;
+    for(int i=0; i<arr.size(); i++){
+        organizedArr[arr[i].value].push_back(arr[i]);
+    }
+    
 }
 
 Data binary_search(vector<Data> &arr, int key) {
@@ -120,6 +138,7 @@ int main() {
 
         if (!dataList.empty()) {
             quickSort(dataList, 0, dataList.size() - 1);
+            nameSort(dataList);
 
             ofstream ofs;
             ofs.open(resultFiles[i]);
