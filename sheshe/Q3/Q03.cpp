@@ -1,167 +1,153 @@
-/*#include <iostream>
-#include <fstream>
-#include <vector>
-#include <string>
-#include <cstdio>
-#include <iomanip>
-#include <algorithm> 
-#include <sstream>
-using namespace std;
-
-/*1.int main∏Ã≠±•˝≈™¿…°A∑QøÏ™kß‚string∏Úint§¿∂}
-2.call function•hß‰´¸©w™∫º∆¶r°A§T≠”function≥£∂]°A¶p™Gß‰§£®Ï¥N•h≈™•t•~§@≠”function
-(´‰¶“¬I:≠n¶p¶Û≥o≠”funtionß‰§£®Ï∏ı•h§U§@≠”)
-3.ß‰®Ï´·¶bß‰®Ï™∫function∏Ã≠±±∆¶C•X®”
-4.¶bmain∏Ã≠±call output function
-5.¶boutput∏Ã≠±¶L•X®”
-
-
-int main(){
-    int inputnum;
-    //cout << "Cin>>";
-    //cin >> inputnum;
-
-    string fileName[] = {"Input1.txt", "Input2.txt", "Input3.txt", "Input4.txt"};
-    for(string filename : fileName){
-
-    vector<int> currentRow;
-    vector<string> names;
-    vector<int> numbers;
-    string mode, word, name;
-
-    ifstream file(filename);
-
-    if(!file.is_open()){
-        cerr << "could not open the file" << filename << endl;
-    }
-
-    else if (file.is_open()) {
-        file >> mode;
-        string name;
-        while (file >> name){
-            cout << name << "\n";
-            names.push_back(name);
-        }
-        file.close();
-    }
-
-    cout << endl;
-   
-
-}
-
-return 0;
-}
-*/
-/*#include <iostream>
-#include <fstream>
-#include <vector>
-#include <string>
-#include <sstream>
-
-using namespace std;
-
-void find_nums(ifstream &ifs, vector<string> &names, vector<int> &scores);
-//void transMat(ifstream &file, vector<vector<int>> &matrix, vector<int> &currentRow);  §W§@√D™∫
-int main() {
-    string fileNames[] = {"Input1.txt", "Input2.txt", "Input3.txt", "Input4.txt"};
-
-    for (string fileName : fileNames) {
-
-        vector<string> names;
-        ifstream ifs("Input1.txt", std::ios::in);
-        if (!ifs.is_open()) {
-            cout << "Failed to open file.\n";
-            return 1; 
-        }
-        else{
-        string word;
-        vector<vector<int>> matrix1;
-        vector<int> currentrow;
-        vector<string> currentrow2;
-        while (ifs >> word) {
-            if (isdigit(word[0])){
-            int num = stoi(word);
-            currentrow.push_back(num);
-            currentrow.clear();
-        }
-            else if(!isdigit(word[0])){
-                string word1 = word;
-                currentrow2.push_back(word1);
-                currentrow2.clear();
-            }
-        
-
-           // string word;
-            //ifs >> word;
-            //cout << name <<  "\n";
-            //names.push_back(name);
-
-            
-        }
-    }
-        ifs.close();
-        cout << "End of:" << fileNames << endl;
-        cout << endl;
-    }
-
-    return 0;
-}
-
-void find_nums(ifstream &ifs, vector<string> &names, vector<int> &scores){
-    
-}
-*/
-
 #include <iostream>
 #include <fstream>
 #include <vector>
 #include <string>
 #include <sstream>
+#include <ostream>
 
 using namespace std;
+//void transMat(ifstream &file, vector<vector<int>> &matrix, vector<int> &currentRow)
+//transMat(file, matrix, currentRow)
 
 struct Data{
     string name;
     int value;    
 };
 
-void find_nums(ifstream &ifs, vector<string> &names);
-//void transMat(ifstream &file, vector<vector<int>> &matrix, vector<int> &currentRow);  §W§@√D™∫
-int main() {
-    string fileNames[] = {"Input1.txt"/*, "Input2.txt", "Input3.txt", "Input4.txt"*/};
-    string inputnum;
-    cout << "Cin >> ";
-    cin >> inputnum;
 
-    for (string fileName : fileNames) {
-        vector<Data> names;
-        //vector<int> scores;
-        ifstream ifs("Input1.txt", std::ios::in);
+int partition(vector<Data> &arr, int start, int end)
+{
+    int pivot = arr[start].value;//Ë®≠ÁΩÆÁ¨¨‰∏Ä‰ΩçÁÇ∫pivot
+    int count = 0;
+    for (int i = start + 1; i <= end; i++){
+        if (arr[i].value <= pivot)
+            count++;
+    }
+ 
+    // Giving pivot element its correct position
+    int pivotIndex = start + count;
+    swap(arr[pivotIndex], arr[start]);
+ 
+    // Sorting left and right parts of the pivot element
+    int i = start, j = end;
+ 
+    while (i < pivotIndex && j > pivotIndex){
+ 
+        while (arr[i].value<= pivot) {
+            i++;
+        }
+ 
+        while (arr[j].value > pivot) {
+            j--;
+        }
+ 
+        if (i < pivotIndex && j > pivotIndex){
+            swap(arr[i++], arr[j--]);
+        }
+    }
+ 
+    return pivotIndex;
+}
+
+void quickSort(vector<Data> &arr, int start, int end)
+{
+    // base case
+    if (start >= end)
+    {
+        return;
+    }
+        
+ 
+    // partitioning the array
+    int p = partition(arr, start, end);
+ 
+    // Sorting the left part
+    quickSort(arr, start, p - 1);
+ 
+    // Sorting the right part
+    quickSort(arr, p + 1, end);
+
+}
+
+Data binary_search(vector<Data> &arr, int key) {
+    int low = 0;
+    int high = arr.size()-1;
+    while (low <= high) {
+        int mid = int((low + high) / 2);
+        if (key == arr[mid].value)
+            return {arr[mid].name, arr[mid].value};
+        else if (key > arr[mid].value)
+            low = mid + 1;
+        else
+            high = mid - 1;
+    }
+    return {"", -1};
+}
+
+int main() {
+   
+    string fileNames[] = {"Input1.txt", "Input2.txt", "Input3.txt", "Input4.txt"};
+    string resultFiles[] = {"test1_result.txt", "test2_result.txt", "test3_result.txt", "test4_result.txt"};
+    
+    int targetNum;
+    cout << "Cin >> ";
+    cin >> targetNum;
+
+    for (int i = 0; i < 4; i++) {
+        string currentFile = fileNames[i];
+        vector<Data> dataList;
+        
+        
+        ifstream ifs(currentFile);
         if (!ifs.is_open()) {
-            cout << "Failed to open file.\n";
-            return 1; 
+            cout << "ÁÑ°Ê≥ïÈñãÂïüÊ™îÊ°à: " << currentFile << endl;
+            continue;
         }
 
         string line;
-        string name;
-
-        while(getline(ifs,line)){
+        while (getline(ifs, line)) {
             stringstream ss(line);
             string n;
             int v;
-            while(ss >> n >> v){
-                struct Data data;
-                data.name = n;
-                data.value = v;
-                names.push_back(data);
+            while (ss >> n >> v) {
+                Data temp;
+                temp.name = n;
+                temp.value = v;
+                dataList.push_back(temp);
             }
-            
-        }    
-        cout << "End of:" << fileNames << endl;
-        cout << endl;
-    }
+        }
+        ifs.close();
 
+        if (!dataList.empty()) {
+            quickSort(dataList, 0, dataList.size() - 1);
+
+            ofstream ofs;
+            ofs.open(resultFiles[i]);
+
+            if (!ofs.is_open()) {
+                cout << "Failed to open file.\n";
+                    return 1; // EXIT_FAILURE
+            }
+            if(binary_search(dataList, targetNum).value == -1){
+                ofs << "Cannoot Find " << targetNum <<endl;
+                for(int i=0; i<dataList.size(); i++){
+                    ofs << dataList[i].name << " " << dataList[i].value << endl;
+                }
+            }
+            else{
+                ofs << "Find " << binary_search(dataList, targetNum).name << " " << binary_search(dataList, targetNum).value << endl;
+                for(int i=0; i<dataList.size(); i++){
+                    ofs << dataList[i].name << " " << dataList[i].value << endl;
+                }
+            }
+        }
+
+        
+
+        //for(int i = 0; i < dataList.size(); i++){
+          //  cout << dataList[i].name << " " << dataList[i].value << " " ;
+        //}
+
+    }
     return 0;
 }
-
