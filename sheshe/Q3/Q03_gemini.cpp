@@ -6,83 +6,63 @@
 
 using namespace std;
 
-// === ç¬¬ä¸€éƒ¨åˆ†ï¼šè³‡æ–™çµæ§‹å®šç¾© ===
 struct Data {
     string name;
     int value;    
 };
 
-// === ç¬¬äºŒéƒ¨åˆ†ï¼šæ‰‹å¯«æ’åºé›¶ä»¶ (Merge Sort) ===
+// --- §Ö³t±Æ§Çªk¨ç¼Æ¹ê§@¶}©l ---
 
-// è² è²¬ã€Œåˆä½µã€å…©ç–Šå·²ç¶“æ’å¥½åºçš„è³‡æ–™
-void merge(vector<Data>& list, int left, int mid, int right) {
-    vector<Data> leftPart, rightPart;
-    // å°‡è³‡æ–™è¤‡è£½åˆ°æš«å­˜é™£åˆ—
-    for (int i = left; i <= mid; i++) leftPart.push_back(list[i]);
-    for (int i = mid + 1; i <= right; i++) rightPart.push_back(list[i]);
+// ¥æ´«¨â­Ó Data µ²ºcªº¨ç¼Æ
+void swapData(Data &a, Data &b) {
+    Data temp = a;
+    a = b;
+    b = temp;
+}
 
-    int i = 0, j = 0, k = left;
+// ¤À³Î¨ç¼Æ¡G¿ï¨ú°ò·ÇÂI¨Ã²¾°Ê¤¸¯À
+int partition(vector<Data> &arr, int low, int high) {
+    int pivot = arr[high].value; // ¿ï³Ì«á¤@­Ó¤¸¯Àªº¼Æ­È§@¬°°ò·Ç
+    int i = (low - 1); // ¤p©ó°ò·ÇÂI°Ï°ìªº¯Á¤Ş
 
-    // æ¯”è¼ƒä¸¦åˆä½µ
-    while (i < leftPart.size() && j < rightPart.size()) {
-        if (leftPart[i].value <= rightPart[j].value) {
-            list[k] = leftPart[i];
+    for (int j = low; j <= high - 1; j++) {
+        // ¦pªG¥Ø«e¤¸¯Àªº¼Æ­È¤p©ó°ò·ÇÂI
+        if (arr[j].value < pivot) {
             i++;
-        } else {
-            list[k] = rightPart[j];
-            j++;
-        }
-        k++;
-    }
-
-    // è™•ç†å‰©é¤˜è³‡æ–™
-    while (i < leftPart.size()) { list[k] = leftPart[i]; i++; k++; }
-    while (j < rightPart.size()) { list[k] = rightPart[j]; j++; k++; }
-}
-
-void mergeSort(vector<Data>& list, int left, int right) {
-    if (left < right) {
-        int mid = left + (right - left) / 2;
-        mergeSort(list, left, mid);
-        mergeSort(list, mid + 1, right);
-        merge(list, left, mid, right);
-    }
-}
-
-// === ç¬¬ä¸‰éƒ¨åˆ†ï¼šäºŒå…ƒæœå°‹é›¶ä»¶ (Binary Search) ===
-int binarySearch(const vector<Data>& list, int target) {
-    int low = 0;
-    int high = list.size() - 1;
-
-    while (low <= high) {
-        int mid = low + (high - low) / 2;
-        if (list[mid].value == target) {
-            return mid; // æ‰¾åˆ°ç›®æ¨™ï¼Œå›å‚³ç´¢å¼•
-        } else if (list[mid].value < target) {
-            low = mid + 1;
-        } else {
-            high = mid - 1;
+            swapData(arr[i], arr[j]);
         }
     }
-    return -1; // æ²’æ‰¾åˆ°å›å‚³ -1
+    swapData(arr[i + 1], arr[high]);
+    return (i + 1);
 }
 
-// === ç¬¬å››éƒ¨åˆ†ï¼šä¸»ç¨‹å¼ ===
+// §Ö³t±Æ§Ç»¼°j¨ç¼Æ
+void quickSort(vector<Data> &arr, int low, int high) {
+    if (low < high) {
+        int pi = partition(arr, low, high); // §ä¥X°ò·ÇÂIªº¦ì¸m
+
+        // »¼°j±Æ§Ç¥ª¥bÃä»P¥k¥bÃä
+        quickSort(arr, low, pi - 1);
+        quickSort(arr, pi + 1, high);
+    }
+}
+
+// --- §Ö³t±Æ§Çªk¨ç¼Æ¹ê§@µ²§ô ---
+
 int main() {
     string fileNames[] = {"Input1.txt", "Input2.txt", "Input3.txt", "Input4.txt"};
-
-    // ä½œæ¥­è¦æ±‚ï¼šå…ˆè¼¸å…¥è¦æ‰¾çš„æ•¸å­—
-    int targetValue;
+    
+    int targetNum;
     cout << "Cin >> ";
-    cin >> targetValue;
+    cin >> targetNum;
 
-    for (string fileName : fileNames) {
+    for (int i = 0; i < 4; i++) {
+        string currentFile = fileNames[i];
         vector<Data> dataList;
         
-        // è®€å–æª”æ¡ˆ
-        ifstream ifs(fileName); 
+        ifstream ifs(currentFile);
         if (!ifs.is_open()) {
-            cout << "Failed to open file: " << fileName << endl;
+            cout << "µLªk¶}±ÒÀÉ®×: " << currentFile << endl;
             continue;
         }
 
@@ -100,40 +80,13 @@ int main() {
         }
         ifs.close();
 
-        // é€²è¡Œæ’åº
+        // --- ¦b³o¸Ì©I¥s§Ö³t±Æ§Ç ---
         if (!dataList.empty()) {
-            cout << "Sorting " << fileName << "..." << endl;
-            mergeSort(dataList, 0, dataList.size() - 1);
+            quickSort(dataList, 0, dataList.size() - 1);
+            cout << currentFile << " ±Æ§Ç§¹¦¨¡I" << endl;
         }
 
-        // --- è™•ç†è¼¸å‡ºæª”æ¡ˆ ---
-        // è‡ªå‹•ç”Ÿæˆæª”åï¼Œä¾‹å¦‚ Input1.txt -> Input1_result.txt
-        string outName = fileName.substr(0, fileName.find(".")) + "_result.txt";
-        ofstream ofs(outName);
-
-        if (ofs.is_open()) {
-            // åŸ·è¡ŒäºŒå…ƒæœå°‹
-            int foundIndex = binarySearch(dataList, targetValue);
-
-            // å¯«å…¥æœå°‹çµæœï¼ˆä¾ç…§ä½œæ¥­æ ¼å¼æ¨™è¨˜ AXXXï¼‰
-            if (foundIndex != -1) {
-                ofs << "Find " << dataList[foundIndex].name << " " << dataList[foundIndex].value << endl;
-                cout << fileName << ": Find " << dataList[foundIndex].name << " " << dataList[foundIndex].value << endl;
-            } else {
-                ofs << "Cannot Find " << targetValue << endl;
-                cout << fileName << ": Cannot Find " << targetValue << endl;
-            }
-
-            // å¯«å…¥æ’åºå¾Œçš„å®Œæ•´æ¸…å–® (Part A è¦æ±‚)
-            ofs << endl; 
-            for (int i = 0; i < dataList.size(); i++) {
-                ofs << dataList[i].name << " " << dataList[i].value << endl;
-            }
-            ofs.close();
-        }
-
-        cout << "End of: " << fileName << " (Records: " << dataList.size() << ")" << endl;
-        cout << "-----------------------------------" << endl;
+        // ±µ¤U¨Ó§A¥i¥H¦b³o¸Ì¼g Part B ªº¤G¤¸·j´MÅŞ¿è
     }
 
     return 0;
