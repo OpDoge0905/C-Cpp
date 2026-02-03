@@ -81,7 +81,7 @@ Data binary_search(vector<Data> &arr, int key) {
         else
             high = mid - 1;
     }
-    return {"", key};
+    return {"", -1};
 }
 
 int main() {
@@ -117,11 +117,12 @@ int main() {
             }
         }
         ifs.close();
+
         if (!dataList.empty()) {
             quickSort(dataList, 0, dataList.size() - 1);
 
             ofstream ofs;
-            ofs.open("output.txt");
+            ofs.open(resultFiles[i]);
 
             if (!ofs.is_open()) {
                 cout << "Failed to open file.\n";
@@ -129,11 +130,15 @@ int main() {
             }
             if(binary_search(dataList, targetNum).value == -1){
                 ofs << "Cannoot Find " << targetNum <<endl;
-
+                for(int i=0; i<dataList.size(); i++){
+                    ofs << dataList[i].name << " " << dataList[i].value << endl;
+                }
             }
             else{
-                ofs << "Find " << binary_search(dataList, targetNum).name << binary_search(dataList, targetNum).value << endl;
-
+                ofs << "Find " << binary_search(dataList, targetNum).name << " " << binary_search(dataList, targetNum).value << endl;
+                for(int i=0; i<dataList.size(); i++){
+                    ofs << dataList[i].name << " " << dataList[i].value << endl;
+                }
             }
         }
 
