@@ -11,7 +11,7 @@ using namespace std;
 
 struct Data{
     string name;
-    int value;    
+    int value;   
 };
 
 
@@ -70,37 +70,69 @@ void quickSort(vector<Data> &arr, int start, int end)
 }
 
 // TODO 難!!
-vector<Data> nameSort(vector<Data> &arr){
-    if(!arr.empty()){
-        return arr;
-    }
+// vector<Data> nameSort(vector<Data> &arr){
+//     if(!arr.empty()){
+//         return arr;
+//     }
 
-    int maxVal = 0;
-    for(int d: arr){
+//     int maxVal = 0;
+//     for(auto& d: arr){
+//         if(d.value > maxVal){
+//             maxVal = d.value;
+//         }
+//     }
 
-    }
-
-    vector<vector<Data>> organizedArr;
-    for(int i=0; i<arr.size(); i++){
-        organizedArr[arr[i].value].push_back(arr[i]);
-    }
+//     vector<vector<Data>> organizedArr();
+//     for(int i=0; i<arr.size(); i++){
+//         organizedArr[arr[i].value].push_back(arr[i]);
+//     }
     
-}
+// }
 
-Data binary_search(vector<Data> &arr, int key) {
+vector<Data> binary_search(vector<Data> &arr, int key) {
     int low = 0;
     int high = arr.size()-1;
     while (low <= high) {
         int mid = int((low + high) / 2);
-        if (key == arr[mid].value)
-            return {arr[mid].name, arr[mid].value};
+        if (key == arr[mid].value){
+            vector<Data> sameValArr;
+            sameValArr.push_back(arr[mid]);
+            int L = mid-1; 
+            while (L>=0 && arr[mid].value == arr[L].value){
+                sameValArr.push_back(arr[L]);
+                L--;
+            }
+            int R = mid+1; 
+            while (R<arr.size() && arr[mid].value == arr[R].value){
+                sameValArr.push_back(arr[R]);
+                R++;
+            }
+            return sameValArr;
+        }
+            //return {arr[mid].name, arr[mid].value, mid};
         else if (key > arr[mid].value)
             low = mid + 1;
         else
             high = mid - 1;
     }
-    return {"", -1};
+    return {};
 }
+
+// vector<Data> searchSame(Data &targetArr, const vector<Data> &dataList){
+//     vector<Data> sameValArr;
+//     sameValArr.push_back(dataList[targetArr.index]);
+//     int L = targetArr.index-1; 
+//     while (L>=0 && dataList[targetArr.index].value == dataList[L].value){
+//         sameValArr.push_back(dataList[L]);
+//         L--;
+//     }
+//     int R = targetArr.index+1; 
+//     while (R<dataList.size() && dataList[targetArr.index].value == dataList[R].value){
+//         sameValArr.push_back(dataList[R]);
+//         R++;
+//     }
+//     return sameValArr;
+// }
 
 int main() {
    
@@ -138,7 +170,8 @@ int main() {
 
         if (!dataList.empty()) {
             quickSort(dataList, 0, dataList.size() - 1);
-            nameSort(dataList);
+            // TODO
+            //nameSort(dataList);
 
             ofstream ofs;
             ofs.open(resultFiles[i]);
@@ -147,14 +180,22 @@ int main() {
                 cout << "Failed to open file.\n";
                     return 1; // EXIT_FAILURE
             }
-            if(binary_search(dataList, targetNum).value == -1){
-                ofs << "Cannoot Find " << targetNum <<endl;
+
+            int mid = 0;
+            vector<Data> sameTarget = binary_search(dataList, targetNum);
+            if(sameTarget.empty()){
+                ofs << "Cannoot Find " << targetNum << endl << endl;
                 for(int i=0; i<dataList.size(); i++){
                     ofs << dataList[i].name << " " << dataList[i].value << endl;
                 }
             }
             else{
-                ofs << "Find " << binary_search(dataList, targetNum).name << " " << binary_search(dataList, targetNum).value << endl;
+                int sameQuantity = sameTarget.size();
+                for(int i=0 ; i<sameQuantity; i++){
+                    ofs << "Find " << sameTarget[i].name << " " << sameTarget[i].value << endl;
+                }
+                ofs << endl;
+
                 for(int i=0; i<dataList.size(); i++){
                     ofs << dataList[i].name << " " << dataList[i].value << endl;
                 }
