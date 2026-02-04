@@ -4,36 +4,32 @@
 #include <string>
 #include <sstream>
 #include <ostream>
+#include <filesystem>
 
 using namespace std;
-//void transMat(ifstream &file, vector<vector<int>> &matrix, vector<int> &currentRow)
-//transMat(file, matrix, currentRow)
 
 struct Data{
     string name;
     int value;   
 };
 
-
 int partition(vector<Data> &arr, int start, int end)
 {
-    int pivot = arr[start].value;//設置第一位為pivot
+    int pivot = arr[start].value;
     int count = 0;
     for (int i = start + 1; i <= end; i++){
         if (arr[i].value <= pivot)
             count++;
     }
     
-    // Giving pivot element its correct position
     int pivotIndex = start + count;
     swap(arr[pivotIndex], arr[start]);
  
-    // Sorting left and right parts of the pivot element
     int i = start, j = end;
  
     while (i < pivotIndex && j > pivotIndex){
  
-        while (arr[i].value<= pivot) {
+        while (arr[i].value <= pivot) {
             i++;
         }
  
@@ -51,102 +47,90 @@ int partition(vector<Data> &arr, int start, int end)
 
 void quickSort(vector<Data> &arr, int start, int end)
 {
-    // base case
     if (start >= end)
     {
         return;
     }
         
- 
-    // partitioning the array
     int p = partition(arr, start, end);
  
-    // Sorting the left part
     quickSort(arr, start, p - 1);
  
-    // Sorting the right part
     quickSort(arr, p + 1, end);
-
 }
 
-// TODO 難!!
-// vector<Data> nameSort(vector<Data> &arr){
-//     if(!arr.empty()){
-//         return arr;
-//     }
+vector<Data> binary_search(vector<Data> &arr, int key) {    
+    int firstIdx = -1;
+    int lastIdx = -1;
+    vector<Data> sameValArr;
 
-//     int maxVal = 0;
-//     for(auto& d: arr){
-//         if(d.value > maxVal){
-//             maxVal = d.value;
-//         }
-//     }
-
-//     vector<vector<Data>> organizedArr();
-//     for(int i=0; i<arr.size(); i++){
-//         organizedArr[arr[i].value].push_back(arr[i]);
-//     }
-    
-// }
-
-vector<Data> binary_search(vector<Data> &arr, int key) {
+    //Find firstIdx
     int low = 0;
     int high = arr.size()-1;
     while (low <= high) {
         int mid = int((low + high) / 2);
-        if (key == arr[mid].value){
-            vector<Data> sameValArr;
-            sameValArr.push_back(arr[mid]);
-            int L = mid-1; 
-            while (L>=0 && arr[mid].value == arr[L].value){
-                sameValArr.push_back(arr[L]);
-                L--;
+        if (arr[mid].value>=key){
+            if(arr[mid].value == key){
+                firstIdx = mid;
             }
-            int R = mid+1; 
-            while (R<arr.size() && arr[mid].value == arr[R].value){
-                sameValArr.push_back(arr[R]);
-                R++;
-            }
-            return sameValArr;
+            high = mid-1;
         }
-            //return {arr[mid].name, arr[mid].value, mid};
-        else if (key > arr[mid].value)
-            low = mid + 1;
-        else
-            high = mid - 1;
+        else{
+            low = mid+1;
+        }
     }
-    return {};
-}
+    if(firstIdx == -1){
+        return {};
+    }
 
-// vector<Data> searchSame(Data &targetArr, const vector<Data> &dataList){
-//     vector<Data> sameValArr;
-//     sameValArr.push_back(dataList[targetArr.index]);
-//     int L = targetArr.index-1; 
-//     while (L>=0 && dataList[targetArr.index].value == dataList[L].value){
-//         sameValArr.push_back(dataList[L]);
-//         L--;
-//     }
-//     int R = targetArr.index+1; 
-//     while (R<dataList.size() && dataList[targetArr.index].value == dataList[R].value){
-//         sameValArr.push_back(dataList[R]);
-//         R++;
-//     }
-//     return sameValArr;
-// }
+    //Find lastIdx
+    low = 0;
+    high = arr.size()-1;
+    while (low <= high) {
+        int mid = int((low + high) / 2);
+        if(arr[mid].value<=key){
+            if(arr[mid].value == key){
+                lastIdx = mid;
+            }
+            low = mid+1;
+        }
+        else{
+            high = mid-1;
+        }
+    }
+
+    if(firstIdx == -1 && lastIdx == -1){
+        return {};
+    }
+
+    for(int i = firstIdx; i<=lastIdx; i++){
+        sameValArr.push_back(arr[i]);
+    }
+    return sameValArr;
+}
 
 int main() {
    
     string fileNames[] = {"Input1.txt", "Input2.txt", "Input3.txt", "Input4.txt"};
     string resultFiles[] = {"test1_result.txt", "test2_result.txt", "test3_result.txt", "test4_result.txt"};
-    
+    string folderPath;
     int targetNum;
+
+    cout << "Destination Folder Location: ";
+    
+    getline(cin >> ws, folderPath);
+
+    int targetNum;  
     cout << "Cin >> ";
-    cin >> targetNum;
+    while(!(cin >> targetNum)){
+        cout << "ERROR! Number Only! \n Cin >> ";
+        cin.clear();
+        cin.ignore('\n');
+    }
 
     for (int i = 0; i < 4; i++) {
         string currentFile = fileNames[i];
         vector<Data> dataList;
-        
         
         ifstream ifs(currentFile);
         if (!ifs.is_open()) {
@@ -170,18 +154,15 @@ int main() {
 
         if (!dataList.empty()) {
             quickSort(dataList, 0, dataList.size() - 1);
-            // TODO
-            //nameSort(dataList);
 
             ofstream ofs;
             ofs.open(resultFiles[i]);
 
             if (!ofs.is_open()) {
                 cout << "Failed to open file.\n";
-                    return 1; // EXIT_FAILURE
+                return 1;
             }
 
-            int mid = 0;
             vector<Data> sameTarget = binary_search(dataList, targetNum);
             if(sameTarget.empty()){
                 ofs << "Cannoot Find " << targetNum << endl << endl;
@@ -201,13 +182,6 @@ int main() {
                 }
             }
         }
-
-        
-
-        //for(int i = 0; i < dataList.size(); i++){
-          //  cout << dataList[i].name << " " << dataList[i].value << " " ;
-        //}
-
     }
     return 0;
 }
