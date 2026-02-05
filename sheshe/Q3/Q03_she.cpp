@@ -26,26 +26,28 @@ int partition(vector<Data> &arr, int start, int end)
  
     // Giving pivot element its correct position
     int pivotIndex = start + count;
-    swap(arr[pivotIndex], arr[start]);
+    Data tempPivot = arr[pivotIndex];
+    arr[pivotIndex] = arr[start];
+    arr[start] = tempPivot;
  
     // Sorting left and right parts of the pivot element
     int i = start, j = end;
  
-    while (i < pivotIndex && j > pivotIndex){
- 
-        while (arr[i].value<= pivot) {
+    while (i < pivotIndex && j > pivotIndex) {
+        while (i < pivotIndex && arr[i].value <= pivot) {
             i++;
         }
- 
-        while (arr[j].value > pivot) {
+        while (j > pivotIndex && arr[j].value > pivot) {
             j--;
         }
- 
-        if (i < pivotIndex && j > pivotIndex){
-            swap(arr[i++], arr[j--]);
+        if (i < pivotIndex && j > pivotIndex) {
+            Data temp = arr[i];
+            arr[i] = arr[j];
+            arr[j] = temp;
+            i++;
+            j--;
         }
     }
- 
     return pivotIndex;
 }
 
@@ -57,7 +59,6 @@ void quickSort(vector<Data> &arr, int start, int end)
         return;
     }
         
- 
     // partitioning the array
     int p = partition(arr, start, end);
  
@@ -88,6 +89,9 @@ Data binary_search(vector<Data> &arr, int key) {
           //  high = mid - 1;
     }
     //return {"", -1};
+    if (low >= arr.size()){ 
+        return {"NotFound", -1};
+    }
     return {arr[low].name, arr[low].value};
 }
 
@@ -103,20 +107,22 @@ int main() {
     while(!(cin >> fileNo)){
         cout << "ERROR! Number Only! \n Cin >> ";
         cin.clear();
-        cin.ignore('\n');
+        cin.ignore(1000, '\n');
     }
+    fileNo--;
 
     int targetNum;  
     cout << "Cin >> ";
     while(!(cin >> targetNum)){
         cout << "ERROR! Number Only! \n Cin >> ";
         cin.clear();
-        cin.ignore('\n');
+        cin.ignore(1000, '\n');
     }
 
     string currentFile = fileNames[fileNo];
     vector<Data> dataList;
-    string fullPath = (filesystem::path(folderPath) / currentFile).string();
+    string resultPath = (std::filesystem::path(folderPath) / resultFiles[fileNo]).string();
+    string fullPath = (std::filesystem::path(folderPath) / currentFile).string();
 
     cout << "\nLoading the File: " << fullPath << endl;
 
@@ -124,11 +130,6 @@ int main() {
     if (!ifs.is_open()) {
         cerr << "ERROR! Check ur Location!" << endl;
         return 0;
-    }
-        
-    ifstream ifs(currentFile);
-    if (!ifs.is_open()) {
-        cout << "無法開啟檔案: " << currentFile << endl;
     }
 
     string line;
@@ -148,39 +149,28 @@ int main() {
     if (!dataList.empty()) {
         quickSort(dataList, 0, dataList.size() - 1);
 
-        ofstream ofs;
-        ofs.open(resultFiles[i]);
-
+        ofstream ofs(resultPath);
         if (!ofs.is_open()) {
             cout << "Failed to open file.\n";
                 return 1; // EXIT_FAILURE
         }
-        if(binary_search(dataList, targetNum).value != targetNum){
+        Data bsResult = binary_search(dataList, targetNum);
+        if(bsResult.value != targetNum){
             ofs << "Cannoot Find " << targetNum <<endl;
-            for(int i=0; i<dataList.size(); i++){
-                ofs << dataList[i].name << " " << dataList[i].value << endl;
-            }
         }
         else{
-            for(int i = 0; i <= dataList.size(); i++){
-                if(dataList[i].value == binary_search(dataList, targetNum).value){
-                    ofs << "Find" << binary_search(dataList, targetNum).name << " " << binary_search(dataList, targetNum).value << endl;
-                    ofs << "Find" << dataList[i].name << " " << dataList[i].value << endl;
+            for(int i = 0; i < dataList.size(); i++){
+                if(dataList[i].value == targetNum){
+                    ofs << "Find " << dataList[i].name << " " << dataList[i].value << endl;
                 }
             }
             //ofs << "Find " << binary_search(dataList, targetNum).name << " " << binary_search(dataList, targetNum).value << endl;
-            for(int i=0; i<dataList.size(); i++){
-                ofs << dataList[i].name << " " << dataList[i].value << endl;
-            }
+        }
+
+        cout << "\n";
+        for(int i=0; i<dataList.size(); i++){
+            ofs << dataList[i].name << " " << dataList[i].value << endl;
         }
     }
-
-    
-
-    //for(int i = 0; i < dataList.size(); i++){
-        //  cout << dataList[i].name << " " << dataList[i].value << " " ;
-    //}
-
-    
     return 0;
 }

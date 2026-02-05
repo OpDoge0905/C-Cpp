@@ -117,15 +117,13 @@ int main() {
     int targetNum;
 
     cout << "Destination Folder Location: ";
-    
     getline(cin >> ws, folderPath);
-
-    int targetNum;  
+  
     cout << "Cin >> ";
     while(!(cin >> targetNum)){
         cout << "ERROR! Number Only! \n Cin >> ";
         cin.clear();
-        cin.ignore('\n');
+        cin.ignore(1000, '\n');
     }
 
     for (int i = 0; i < 4; i++) {
